@@ -1,4 +1,4 @@
-# Listing Engine Backend
+# Listing Engine Backend - Vacational Rental website wordpress plugin
 
 A powerful WordPress admin plugin for managing vacation rental listing data through dedicated database tables and custom wp-admin interfaces.
 
