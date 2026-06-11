@@ -28,6 +28,9 @@
         calBase:      new Date(),       // first day shown
         isMobile:     window.innerWidth < 992,
         mobileOffset: 0,
+        hostId:       '',               // 'NULL' or numeric ID
+        hostEmail:    '',
+        hostMobileNumber: '',
     };
     state.calBase.setDate(1);
 
@@ -74,6 +77,13 @@
         statusTrigger:  $('statusTrigger'),
         statusDropdown: $('statusDropdown'),
         statusDisplay:  $('statusSelectedDisplay'),
+        // Host Detail
+        hostTrigger:    $('hostTrigger'),
+        hostDropdown:   $('hostDropdown'),
+        hostDisplay:    $('hostSelectedDisplay'),
+        hostContactFields: $('hostContactFields'),
+        hostEmail:      $('hostEmail'),
+        hostMobileNumber: $('hostMobileNumber'),
         // Calendar
         calNavBar:      $('calendarNavBar'),
         calNavTitle:    $('calendarNavTitle'),
@@ -112,6 +122,11 @@
             loadTypes();
             loadLocations();
             loadAmenities();
+            // Default to Admin host
+            const adminId = (lebPropAECfg && lebPropAECfg.currentAdminId) || '';
+            const adminName = (lebPropAECfg && lebPropAECfg.currentAdminName) || 'Admin';
+            renderHostOptions('', '');
+            selectHost(adminId, adminName);
         }
     });
 
@@ -236,13 +251,77 @@
         dropdown.classList.remove('open');
     }
 
+    function renderHostOptions(existingHostId, existingHostName) {
+        if (!DOM.hostDropdown) return;
+        DOM.hostDropdown.innerHTML = '';
+
+        const adminId = (lebPropAECfg && lebPropAECfg.currentAdminId) || '';
+        const adminName = (lebPropAECfg && lebPropAECfg.currentAdminName) || 'Admin';
+
+        // Option 1: Admin
+        const adminOpt = buildSingleOption(adminId, adminName, function () {
+            selectHost(adminId, adminName);
+        });
+        DOM.hostDropdown.appendChild(adminOpt);
+
+        // Option 2: Existing non-admin host (only if exists and is not admin)
+        if (existingHostId && String(existingHostId) !== String(adminId) && existingHostId !== 'NULL') {
+            const hostName = existingHostName || ('Host ' + existingHostId);
+            const hostOpt = buildSingleOption(existingHostId, hostName, function () {
+                selectHost(existingHostId, hostName);
+            });
+            DOM.hostDropdown.appendChild(hostOpt);
+        }
+
+        // Option 3: NULL
+        const nullOpt = buildSingleOption('NULL', 'NULL', function () {
+            selectHost('NULL', 'NULL');
+        });
+        DOM.hostDropdown.appendChild(nullOpt);
+    }
+
+    function selectHost(value, label) {
+        state.hostId = value;
+        
+        // Update display text
+        if (value === 'NULL') {
+            DOM.hostDisplay.innerHTML = '<span class="leb-aep-selected-single">NULL</span>';
+        } else {
+            DOM.hostDisplay.innerHTML = '<span class="leb-aep-selected-single">' + esc(label) + '</span>';
+        }
+
+        highlightSelected(DOM.hostDropdown, value);
+        closeDropdown(DOM.hostTrigger, DOM.hostDropdown);
+
+        // Conditional display for Email and Mobile fields
+        if (value === 'NULL') {
+            if (DOM.hostContactFields) DOM.hostContactFields.style.display = 'block';
+            if (DOM.hostEmail) DOM.hostEmail.required = true;
+            if (DOM.hostMobileNumber) DOM.hostMobileNumber.required = true;
+        } else {
+            if (DOM.hostContactFields) DOM.hostContactFields.style.display = 'none';
+            if (DOM.hostEmail) {
+                DOM.hostEmail.required = false;
+                DOM.hostEmail.value = '';
+                state.hostEmail = '';
+            }
+            if (DOM.hostMobileNumber) {
+                DOM.hostMobileNumber.required = false;
+                DOM.hostMobileNumber.value = '';
+                state.hostMobileNumber = '';
+            }
+        }
+        triggerAutosave();
+    }
+
     function closeAllDropdowns() {
         [
             [DOM.amenTrigger, DOM.amenDropdown],
             [DOM.locTrigger,  DOM.locDropdown],
             [DOM.typeTrigger, DOM.typeDropdown],
             [DOM.statusTrigger, DOM.statusDropdown],
-        ].forEach(function (pair) { closeDropdown(pair[0], pair[1]); });
+            [DOM.hostTrigger, DOM.hostDropdown],
+        ].forEach(function (pair) { if (pair[0] && pair[1]) closeDropdown(pair[0], pair[1]); });
     }
 
     function toggleDropdown(trigger, dropdown) {
@@ -261,7 +340,9 @@
             [DOM.locTrigger,  DOM.locDropdown],
             [DOM.typeTrigger, DOM.typeDropdown],
             [DOM.statusTrigger, DOM.statusDropdown],
+            [DOM.hostTrigger, DOM.hostDropdown],
         ].forEach(function (pair) {
+            if (!pair[0] || !pair[1]) return;
             pair[0].addEventListener('click', function (e) {
                 e.stopPropagation();
                 toggleDropdown(pair[0], pair[1]);
@@ -378,7 +459,7 @@
 
                 state.images.push({
                     id:         att.id,
-                    url:        (att.sizes && att.sizes.medium) ? att.sizes.medium.url : att.url,
+                    url:        att.url,
                     sort_order: state.images.length,
                 });
             });
@@ -690,6 +771,29 @@
                     renderCalendar();
                 } catch (e) { console.error('Date parse error', e); }
             }
+
+            /* Host Detail */
+            if (d.host_id === null || d.host_id === '' || d.host_id === 0 || d.host_id === '0') {
+                renderHostOptions('', '');
+                selectHost('NULL', 'NULL');
+                if (DOM.hostEmail) {
+                    DOM.hostEmail.value = d.host_email || '';
+                    state.hostEmail = d.host_email || '';
+                }
+                if (DOM.hostMobileNumber) {
+                    DOM.hostMobileNumber.value = d.host_mobile_number || '';
+                    state.hostMobileNumber = d.host_mobile_number || '';
+                }
+            } else {
+                const adminId = (lebPropAECfg && lebPropAECfg.currentAdminId) || '';
+                if (String(d.host_id) === String(adminId)) {
+                    renderHostOptions('', '');
+                    selectHost(adminId, d.username);
+                } else {
+                    renderHostOptions(d.host_id, d.username);
+                    selectHost(d.host_id, d.username);
+                }
+            }
         });
     }
 
@@ -817,6 +921,28 @@
                 if (!firstError) firstError = DOM.price;
             }
 
+            // Validate Host Detail
+            if (state.hostId === 'NULL') {
+                const hostEmailVal = DOM.hostEmail ? DOM.hostEmail.value.trim() : '';
+                const hostMobileVal = DOM.hostMobileNumber ? DOM.hostMobileNumber.value.trim() : '';
+
+                if (!hostEmailVal) {
+                    showFieldError('hostEmail', 'Host email is required when NULL is selected.');
+                    valid = false;
+                    if (!firstError) firstError = DOM.hostEmail;
+                } else if (!validateEmail(hostEmailVal)) {
+                    showFieldError('hostEmail', 'Please enter a valid email address.');
+                    valid = false;
+                    if (!firstError) firstError = DOM.hostEmail;
+                }
+
+                if (!hostMobileVal) {
+                    showFieldError('hostMobileNumber', 'Host mobile number is required when NULL is selected.');
+                    valid = false;
+                    if (!firstError) firstError = DOM.hostMobileNumber;
+                }
+            }
+
             if (!valid) {
                 LEB_Toaster.show('Please fix the errors before submitting.', 'error');
                 if (firstError) {
@@ -836,22 +962,25 @@
 
             /* ── Build payload ──────────────────────────────── */
             const payload = {
-                action:      action,
-                nonce:       LEB_Ajax.nonce,
-                title:       title,
-                description: DOM.description ? DOM.description.value.trim() : '',
-                guests:      DOM.guests     ? DOM.guests.value     : 0,
-                bedroom:     DOM.bedrooms   ? DOM.bedrooms.value   : 0,
-                bed:         DOM.beds       ? DOM.beds.value       : 0,
-                bathroom:    DOM.bathrooms  ? DOM.bathrooms.value  : 0,
-                address:     DOM.address    ? DOM.address.value.trim() : '',
-                price:       DOM.price      ? DOM.price.value      : 0,
-                type:        state.typeId,
-                location:    state.locationId,
-                status:      state.status,
-                amenities:   JSON.stringify(Array.from(state.amenityIds)),
-                images:      JSON.stringify(state.images),
-                dates:       JSON.stringify(Array.from(state.blockedDates)),
+                action:             action,
+                nonce:              LEB_Ajax.nonce,
+                title:              title,
+                description:        DOM.description ? DOM.description.value.trim() : '',
+                guests:             DOM.guests     ? DOM.guests.value     : 0,
+                bedroom:            DOM.bedrooms   ? DOM.bedrooms.value   : 0,
+                bed:                DOM.beds       ? DOM.beds.value       : 0,
+                bathroom:           DOM.bathrooms  ? DOM.bathrooms.value  : 0,
+                address:            DOM.address    ? DOM.address.value.trim() : '',
+                price:              DOM.price      ? DOM.price.value      : 0,
+                type:               state.typeId,
+                location:           state.locationId,
+                status:             state.status,
+                host_id:            state.hostId,
+                host_email:         state.hostId === 'NULL' ? (DOM.hostEmail ? DOM.hostEmail.value.trim() : '') : '',
+                host_mobile_number: state.hostId === 'NULL' ? (DOM.hostMobileNumber ? DOM.hostMobileNumber.value.trim() : '') : '',
+                amenities:          JSON.stringify(Array.from(state.amenityIds)),
+                images:             JSON.stringify(state.images),
+                dates:              JSON.stringify(Array.from(state.blockedDates)),
             };
 
             if (isEdit) { payload.id = state.id; }
@@ -909,22 +1038,25 @@
         const action = 'leb_listing_create_listing';
 
         const payload = {
-            action:      action,
-            nonce:       LEB_Ajax.nonce,
-            title:       title,
-            description: DOM.description ? DOM.description.value.trim() : '',
-            guests:      DOM.guests     ? DOM.guests.value     : 0,
-            bedroom:     DOM.bedrooms   ? DOM.bedrooms.value   : 0,
-            bed:         DOM.beds       ? DOM.beds.value       : 0,
-            bathroom:    DOM.bathrooms  ? DOM.bathrooms.value  : 0,
-            address:     DOM.address    ? DOM.address.value.trim() : '',
-            price:       DOM.price      ? DOM.price.value      : 0,
-            type:        state.typeId,
-            location:    state.locationId,
-            status:      'draft', // Force draft mode for autosave
-            amenities:   JSON.stringify(Array.from(state.amenityIds)),
-            images:      JSON.stringify(state.images),
-            dates:       JSON.stringify(Array.from(state.blockedDates)),
+            action:             action,
+            nonce:              LEB_Ajax.nonce,
+            title:              title,
+            description:        DOM.description ? DOM.description.value.trim() : '',
+            guests:             DOM.guests     ? DOM.guests.value     : 0,
+            bedroom:            DOM.bedrooms   ? DOM.bedrooms.value   : 0,
+            bed:                DOM.beds       ? DOM.beds.value       : 0,
+            bathroom:           DOM.bathrooms  ? DOM.bathrooms.value  : 0,
+            address:            DOM.address    ? DOM.address.value.trim() : '',
+            price:              DOM.price      ? DOM.price.value      : 0,
+            type:               state.typeId,
+            location:           state.locationId,
+            status:             'draft', // Force draft mode for autosave
+            host_id:            state.hostId,
+            host_email:         state.hostId === 'NULL' ? (DOM.hostEmail ? DOM.hostEmail.value.trim() : '') : '',
+            host_mobile_number: state.hostId === 'NULL' ? (DOM.hostMobileNumber ? DOM.hostMobileNumber.value.trim() : '') : '',
+            amenities:          JSON.stringify(Array.from(state.amenityIds)),
+            images:             JSON.stringify(state.images),
+            dates:              JSON.stringify(Array.from(state.blockedDates)),
         };
 
         jQuery.post(LEB_Ajax.ajax_url, payload, function (res) {
@@ -946,7 +1078,7 @@
 
     function bindAutosaveListeners() {
         const triggers = [
-            DOM.title, DOM.description, DOM.guests, DOM.bedrooms, DOM.beds, DOM.bathrooms, DOM.address, DOM.price
+            DOM.title, DOM.description, DOM.guests, DOM.bedrooms, DOM.beds, DOM.bathrooms, DOM.address, DOM.price, DOM.hostEmail, DOM.hostMobileNumber
         ];
         triggers.forEach(el => {
             if (el) el.addEventListener('input', triggerAutosave);
@@ -954,6 +1086,11 @@
 
         // Dropdown changes, image changes, and calendar changes already call triggerAutosave manually
         // in their respective handlers for better precision.
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
     }
 
     /* ══════════════════════════════════════════════════════════════

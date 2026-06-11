@@ -245,6 +245,41 @@ $back_url   = admin_url( 'admin.php?page=leb-properties' );
         </div>
 
         <!-- ══════════════════════════════════════════
+             SECTION 7.5: HOST DETAIL
+        ══════════════════════════════════════════ -->
+        <div class="leb-aep-section" id="hostDetailSection">
+            <label class="leb-aep-label">Host Detail <span class="leb-aep-req" aria-hidden="true">*</span></label>
+            <div class="leb-aep-select-wrap" id="hostSelectWrapper">
+                <div class="leb-aep-select-trigger" id="hostTrigger"
+                     tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-label="Select host detail">
+                    <span id="hostSelectedDisplay">
+                        <span class="leb-aep-placeholder">Select host…</span>
+                    </span>
+                    <svg class="leb-aep-select-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </div>
+                <div class="leb-aep-select-dropdown" id="hostDropdown" role="listbox" aria-label="Host options">
+                    <!-- Dynamic host options injected by JS -->
+                </div>
+            </div>
+
+            <!-- Conditional Host Contact Fields -->
+            <div id="hostContactFields" style="display: none; margin-top: 20px;">
+                <div class="leb-aep-dropdowns-grid" style="margin-top: 0;">
+                    <div class="leb-aep-select-wrap">
+                        <label class="leb-aep-label" for="hostEmail">Host Email <span class="leb-aep-req" aria-hidden="true">*</span></label>
+                        <input type="email" id="hostEmail" class="leb-aep-input" placeholder="Enter host email">
+                    </div>
+                    <div class="leb-aep-select-wrap">
+                        <label class="leb-aep-label" for="hostMobileNumber">Host Mobile Number <span class="leb-aep-req" aria-hidden="true">*</span></label>
+                        <input type="text" id="hostMobileNumber" class="leb-aep-input" placeholder="Enter host mobile number">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
              SECTION 8: LISTING STATUS
         ══════════════════════════════════════════ -->
         <div class="leb-aep-section">

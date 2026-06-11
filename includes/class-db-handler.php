@@ -1187,25 +1187,31 @@ class LEB_Database_Handler
             $amenities = json_encode($amenities);
         }
 
+        $host_id = ! empty($data['host_id']) ? absint($data['host_id']) : null;
+        $host_email = ! empty($data['host_email']) ? sanitize_email($data['host_email']) : null;
+        $host_mobile_number = ! empty($data['host_mobile_number']) ? sanitize_text_field($data['host_mobile_number']) : null;
+
         $inserted = $wpdb->insert(
             $this->listings_table,
             [
-                'host_id'     => absint($data['host_id'] ?? 0),
-                'title'       => sanitize_text_field($data['title'] ?? ''),
-                'description' => wp_kses_post($data['description'] ?? ''),
-                'guests'      => absint($data['guests'] ?? 0),
-                'bedroom'     => absint($data['bedroom'] ?? 0),
-                'bed'         => absint($data['bed'] ?? 0),
-                'bathroom'    => absint($data['bathroom'] ?? 0),
-                'price'       => absint($data['price'] ?? 0),
-                'type'        => sanitize_text_field($data['type'] ?? ''),
-                'location'    => sanitize_text_field($data['location'] ?? ''),
-                'address'     => sanitize_text_field($data['address'] ?? ''),
-                'amenities'   => sanitize_text_field($amenities),
-                'status'      => sanitize_text_field($data['status'] ?? 'draft'),
-                'updated_at'  => current_time('mysql'),
+                'host_id'            => $host_id,
+                'title'              => sanitize_text_field($data['title'] ?? ''),
+                'description'        => wp_kses_post($data['description'] ?? ''),
+                'guests'             => absint($data['guests'] ?? 0),
+                'bedroom'            => absint($data['bedroom'] ?? 0),
+                'bed'                => absint($data['bed'] ?? 0),
+                'bathroom'           => absint($data['bathroom'] ?? 0),
+                'price'              => absint($data['price'] ?? 0),
+                'type'               => sanitize_text_field($data['type'] ?? ''),
+                'location'           => sanitize_text_field($data['location'] ?? ''),
+                'address'            => sanitize_text_field($data['address'] ?? ''),
+                'amenities'          => sanitize_text_field($amenities),
+                'status'             => sanitize_text_field($data['status'] ?? 'draft'),
+                'host_email'         => $host_email,
+                'host_mobile_number' => $host_mobile_number,
+                'updated_at'         => current_time('mysql'),
             ],
-            ['%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
+            ['%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
         );
 
         if (false === $inserted) {
@@ -1266,25 +1272,32 @@ class LEB_Database_Handler
             $amenities = json_encode($amenities);
         }
 
+        $host_id = ! empty($data['host_id']) ? absint($data['host_id']) : null;
+        $host_email = ! empty($data['host_email']) ? sanitize_email($data['host_email']) : null;
+        $host_mobile_number = ! empty($data['host_mobile_number']) ? sanitize_text_field($data['host_mobile_number']) : null;
+
         $updated = $wpdb->update(
             $this->listings_table,
             [
-                'title'       => sanitize_text_field($data['title'] ?? ''),
-                'description' => wp_kses_post($data['description'] ?? ''),
-                'guests'      => absint($data['guests'] ?? 0),
-                'bedroom'     => absint($data['bedroom'] ?? 0),
-                'bed'         => absint($data['bed'] ?? 0),
-                'bathroom'    => absint($data['bathroom'] ?? 0),
-                'price'       => absint($data['price'] ?? 0),
-                'type'        => sanitize_text_field($data['type'] ?? ''),
-                'location'    => sanitize_text_field($data['location'] ?? ''),
-                'address'     => sanitize_text_field($data['address'] ?? ''),
-                'amenities'   => sanitize_text_field($amenities),
-                'status'      => sanitize_text_field($data['status'] ?? 'draft'),
-                'updated_at'  => current_time('mysql'),
+                'host_id'            => $host_id,
+                'title'              => sanitize_text_field($data['title'] ?? ''),
+                'description'        => wp_kses_post($data['description'] ?? ''),
+                'guests'             => absint($data['guests'] ?? 0),
+                'bedroom'            => absint($data['bedroom'] ?? 0),
+                'bed'                => absint($data['bed'] ?? 0),
+                'bathroom'           => absint($data['bathroom'] ?? 0),
+                'price'              => absint($data['price'] ?? 0),
+                'type'               => sanitize_text_field($data['type'] ?? ''),
+                'location'           => sanitize_text_field($data['location'] ?? ''),
+                'address'            => sanitize_text_field($data['address'] ?? ''),
+                'amenities'          => sanitize_text_field($amenities),
+                'status'             => sanitize_text_field($data['status'] ?? 'draft'),
+                'host_email'         => $host_email,
+                'host_mobile_number' => $host_mobile_number,
+                'updated_at'         => current_time('mysql'),
             ],
             ['id' => $id],
-            ['%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s'],
+            ['%d', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s'],
             ['%d']
         );
 

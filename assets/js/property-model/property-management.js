@@ -181,7 +181,7 @@
           '<div class="leb-pm-card-row">' +
           '<div class="leb-pm-card-label">Host</div>' +
           '<div class="leb-pm-card-value">' +
-          escHtml(item.username || "—") +
+          escHtml((item.host_id === null || item.host_id === '' || item.host_id === 0 || item.host_id === '0' || item.host_id === 'NULL') ? (item.host_mobile_number || "—") : (item.username || "—")) +
           "</div>" +
           "</div>" +
           '<div class="leb-pm-card-row">' +

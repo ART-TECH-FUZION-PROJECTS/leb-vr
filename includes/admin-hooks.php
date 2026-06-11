@@ -1102,22 +1102,33 @@ function leb_ajax_listing_create_listing()
         wp_send_json_error(['message' => __('Property address is required.', 'listing-engine-backend')]);
     }
 
+    $host_id = isset($_POST['host_id']) ? sanitize_text_field(wp_unslash($_POST['host_id'])) : '';
+    if ($host_id === 'NULL') {
+        $host_id = null;
+    } elseif ($host_id === '') {
+        $host_id = get_current_user_id();
+    } else {
+        $host_id = absint($host_id);
+    }
+
     $data = [
-        'host_id'     => get_current_user_id(),
-        'title'       => $title,
-        'description' => isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description'])) : '',
-        'guests'      => isset($_POST['guests'])      ? absint($_POST['guests'])      : 0,
-        'bedroom'     => isset($_POST['bedroom'])     ? absint($_POST['bedroom'])     : 0,
-        'bed'         => isset($_POST['bed'])         ? absint($_POST['bed'])         : 0,
-        'bathroom'    => isset($_POST['bathroom'])    ? absint($_POST['bathroom'])    : 0,
-        'price'       => isset($_POST['price'])       ? absint($_POST['price'])       : 0,
-        'type'        => isset($_POST['type'])        ? sanitize_text_field(wp_unslash($_POST['type']))     : '',
-        'location'    => isset($_POST['location'])    ? sanitize_text_field(wp_unslash($_POST['location'])) : '',
-        'address'     => $address,
-        'amenities'   => isset($_POST['amenities'])   ? sanitize_text_field(wp_unslash($_POST['amenities'])) : '',
-        'status'      => isset($_POST['status'])      ? sanitize_text_field(wp_unslash($_POST['status']))  : 'draft',
-        'images'      => isset($_POST['images'])      ? wp_unslash($_POST['images'])  : '[]',
-        'dates'       => isset($_POST['dates'])       ? wp_unslash($_POST['dates'])   : '[]',
+        'host_id'            => $host_id,
+        'host_email'         => isset($_POST['host_email']) ? sanitize_email(wp_unslash($_POST['host_email'])) : null,
+        'host_mobile_number' => isset($_POST['host_mobile_number']) ? sanitize_text_field(wp_unslash($_POST['host_mobile_number'])) : null,
+        'title'              => $title,
+        'description'        => isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description'])) : '',
+        'guests'             => isset($_POST['guests'])      ? absint($_POST['guests'])      : 0,
+        'bedroom'            => isset($_POST['bedroom'])     ? absint($_POST['bedroom'])     : 0,
+        'bed'                => isset($_POST['bed'])         ? absint($_POST['bed'])         : 0,
+        'bathroom'           => isset($_POST['bathroom'])    ? absint($_POST['bathroom'])    : 0,
+        'price'              => isset($_POST['price'])       ? absint($_POST['price'])       : 0,
+        'type'               => isset($_POST['type'])        ? sanitize_text_field(wp_unslash($_POST['type']))     : '',
+        'location'           => isset($_POST['location'])    ? sanitize_text_field(wp_unslash($_POST['location'])) : '',
+        'address'            => $address,
+        'amenities'          => isset($_POST['amenities'])   ? sanitize_text_field(wp_unslash($_POST['amenities'])) : '',
+        'status'             => isset($_POST['status'])      ? sanitize_text_field(wp_unslash($_POST['status']))  : 'draft',
+        'images'             => isset($_POST['images'])      ? wp_unslash($_POST['images'])  : '[]',
+        'dates'              => isset($_POST['dates'])       ? wp_unslash($_POST['dates'])   : '[]',
     ];
 
     // Validate images
@@ -1154,21 +1165,31 @@ function leb_ajax_listing_update_listing()
         wp_send_json_error(['message' => __('Invalid ID.', 'listing-engine-backend')]);
     }
 
+    $host_id = isset($_POST['host_id']) ? sanitize_text_field(wp_unslash($_POST['host_id'])) : '';
+    if ($host_id === 'NULL' || $host_id === '') {
+        $host_id = null;
+    } else {
+        $host_id = absint($host_id);
+    }
+
     $data = [
-        'title'       => isset($_POST['title'])       ? sanitize_text_field(wp_unslash($_POST['title']))     : '',
-        'description' => isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description']))      : '',
-        'guests'      => isset($_POST['guests'])      ? absint($_POST['guests'])      : 0,
-        'bedroom'     => isset($_POST['bedroom'])     ? absint($_POST['bedroom'])     : 0,
-        'bed'         => isset($_POST['bed'])         ? absint($_POST['bed'])         : 0,
-        'bathroom'    => isset($_POST['bathroom'])    ? absint($_POST['bathroom'])    : 0,
-        'price'       => isset($_POST['price'])       ? absint($_POST['price'])       : 0,
-        'type'        => isset($_POST['type'])        ? sanitize_text_field(wp_unslash($_POST['type']))     : '',
-        'location'    => isset($_POST['location'])    ? sanitize_text_field(wp_unslash($_POST['location'])) : '',
-        'address'     => isset($_POST['address'])     ? sanitize_text_field(wp_unslash($_POST['address']))  : '',
-        'amenities'   => isset($_POST['amenities'])   ? sanitize_text_field(wp_unslash($_POST['amenities'])) : '',
-        'status'      => isset($_POST['status'])      ? sanitize_text_field(wp_unslash($_POST['status']))  : 'draft',
-        'images'      => isset($_POST['images'])      ? wp_unslash($_POST['images'])  : '[]',
-        'dates'       => isset($_POST['dates'])       ? wp_unslash($_POST['dates'])   : '[]',
+        'host_id'            => $host_id,
+        'host_email'         => isset($_POST['host_email']) ? sanitize_email(wp_unslash($_POST['host_email'])) : null,
+        'host_mobile_number' => isset($_POST['host_mobile_number']) ? sanitize_text_field(wp_unslash($_POST['host_mobile_number'])) : null,
+        'title'              => isset($_POST['title'])       ? sanitize_text_field(wp_unslash($_POST['title']))     : '',
+        'description'        => isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description']))      : '',
+        'guests'             => isset($_POST['guests'])      ? absint($_POST['guests'])      : 0,
+        'bedroom'            => isset($_POST['bedroom'])     ? absint($_POST['bedroom'])     : 0,
+        'bed'                => isset($_POST['bed'])         ? absint($_POST['bed'])         : 0,
+        'bathroom'           => isset($_POST['bathroom'])    ? absint($_POST['bathroom'])    : 0,
+        'price'              => isset($_POST['price'])       ? absint($_POST['price'])       : 0,
+        'type'               => isset($_POST['type'])        ? sanitize_text_field(wp_unslash($_POST['type']))     : '',
+        'location'           => isset($_POST['location'])    ? sanitize_text_field(wp_unslash($_POST['location'])) : '',
+        'address'            => isset($_POST['address'])     ? sanitize_text_field(wp_unslash($_POST['address']))  : '',
+        'amenities'          => isset($_POST['amenities'])   ? sanitize_text_field(wp_unslash($_POST['amenities'])) : '',
+        'status'             => isset($_POST['status'])      ? sanitize_text_field(wp_unslash($_POST['status']))  : 'draft',
+        'images'             => isset($_POST['images'])      ? wp_unslash($_POST['images'])  : '[]',
+        'dates'              => isset($_POST['dates'])       ? wp_unslash($_POST['dates'])   : '[]',
     ];
 
     // Validate images

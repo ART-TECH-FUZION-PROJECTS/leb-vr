@@ -128,7 +128,7 @@ function leb_get_listings_schema() {
     $table_name = $wpdb->prefix . 'ls_property';
     return "CREATE TABLE $table_name (
         id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        host_id bigint(20) UNSIGNED NOT NULL,
+        host_id bigint(20) UNSIGNED DEFAULT NULL,
         title varchar(255) NOT NULL,
         location longtext NOT NULL,
         address longtext NOT NULL,
@@ -142,6 +142,8 @@ function leb_get_listings_schema() {
         price bigint(20) DEFAULT 0,
         map longtext DEFAULT NULL,
         status varchar(50) DEFAULT 'draft',
+        host_email varchar(255) DEFAULT NULL,
+        host_mobile_number varchar(50) DEFAULT NULL,
         updated_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         PRIMARY KEY  (id)
     ) {$wpdb->get_charset_collate()};";

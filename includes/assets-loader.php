@@ -246,6 +246,11 @@ function leb_enqueue_admin_assets(string $hook_suffix)
             $js_path  = 'property-model/add-edit-property.js';
             wp_enqueue_style('leb-prop-add-edit', LEB_ASSETS_CSS_URL . $css_path, ['leb-global', 'leb-shared-css'], filemtime(LEB_PLUGIN_DIR . 'assets/css/' . $css_path));
             wp_enqueue_script('leb-prop-add-edit', LEB_ASSETS_JS_URL . $js_path, ['jquery'], filemtime(LEB_PLUGIN_DIR . 'assets/js/' . $js_path), true);
+            $current_user = wp_get_current_user();
+            wp_localize_script('leb-prop-add-edit', 'lebPropAECfg', [
+                'currentAdminId'   => $current_user->ID,
+                'currentAdminName' => $current_user->display_name ?: $current_user->user_login,
+            ]);
         } else {
             $css_path = 'property-model/property-management.css';
             $js_path  = 'property-model/property-management.js';
