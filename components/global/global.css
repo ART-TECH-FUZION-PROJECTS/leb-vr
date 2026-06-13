@@ -19,8 +19,8 @@
     --leb-font-family:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
     /* ── Brand / Primary Palette ── */
-    --leb-primary-color:    #F15E74;   /* Coral red – buttons, accents */
-    --leb-primary-dark:     #e8445e;   /* Darker variant for gradients */
+    --leb-primary-color:    #D97757;  /* Coral red – buttons, accents */
+    --leb-primary-dark:     #C26143;   /* Darker variant for gradients */
     --leb-primary-glow:     rgba(241, 94, 116, 0.25);  /* Box-shadow tint */
     --leb-primary-light-bg: #ffe6ea;   /* Soft red for focus rings */
 
