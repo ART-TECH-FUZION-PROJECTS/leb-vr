@@ -959,13 +959,15 @@ class LEB_Database_Handler
 
         $offset = ($page - 1) * $per_page;
 
-        // Base SELECT with JOINs for type name, username, and first image.
+        // Base SELECT with JOINs for type name, location name, username, and first image.
         $base_select = "SELECT l.*, 
             t.name AS type_name, 
+            loc.name AS location_name,
             u.user_login AS username,
             img.image AS first_image
             FROM `{$this->listings_table}` AS l
             LEFT JOIN `{$this->types_table}` AS t ON l.type = t.id
+            LEFT JOIN `{$this->locations_table}` AS loc ON l.location = loc.id
             LEFT JOIN `{$wpdb->users}` AS u ON l.host_id = u.ID
             LEFT JOIN `{$this->ls_img_table}` AS img ON img.property_id = l.id";
 

@@ -185,6 +185,12 @@
           "</div>" +
           "</div>" +
           '<div class="leb-pm-card-row">' +
+          '<div class="leb-pm-card-label">Location</div>' +
+          '<div class="leb-pm-card-value">' +
+          escHtml(item.location_name || "—") +
+          "</div>" +
+          "</div>" +
+          '<div class="leb-pm-card-row">' +
           '<div class="leb-pm-card-label">Status</div>' +
           '<div class="leb-pm-card-value">' +
           '<span class="leb-pm-status-badge leb-pm-status-badge--' +
