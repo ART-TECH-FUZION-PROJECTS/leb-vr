@@ -971,7 +971,11 @@ class LEB_Database_Handler
             LEFT JOIN `{$wpdb->users}` AS u ON l.host_id = u.ID
             LEFT JOIN `{$this->ls_img_table}` AS img ON img.property_id = l.id";
 
-        $base_count = "SELECT COUNT(*) FROM `{$this->listings_table}` AS l";
+        // Count query must mirror the JOINs used for filtering so that
+        // location / username / host_mobile_number searches still match.
+        $base_count = "SELECT COUNT(DISTINCT l.id) FROM `{$this->listings_table}` AS l
+            LEFT JOIN `{$this->locations_table}` AS loc ON l.location = loc.id
+            LEFT JOIN `{$wpdb->users}` AS u ON l.host_id = u.ID";
 
         // Build WHERE clauses.
         $where_parts = [];
@@ -983,8 +987,13 @@ class LEB_Database_Handler
         }
 
         if (! empty($search)) {
+            // Search across title, location name, host username, and the
+            // host_mobile_number used by custom (non-WP-user) hosts.
             $like          = '%' . $wpdb->esc_like($search) . '%';
-            $where_parts[] = 'l.title LIKE %s';
+            $where_parts[] = '(l.title LIKE %s OR loc.name LIKE %s OR u.user_login LIKE %s OR l.host_mobile_number LIKE %s)';
+            $where_vals[]  = $like;
+            $where_vals[]  = $like;
+            $where_vals[]  = $like;
             $where_vals[]  = $like;
         }
 

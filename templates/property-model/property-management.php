@@ -106,7 +106,7 @@ $add_new_url = admin_url('admin.php?page=leb-properties&leb_action=add');
                 <input
                     type="text"
                     class="leb-pm-search-input"
-                    placeholder="Search by title or host…"
+                    placeholder="Search by title, host or location…"
                     id="leb-pm-search-input"
                     autocomplete="off">
                 <button class="leb-pm-search-clear-btn" id="leb-pm-search-clear-btn" type="button">
